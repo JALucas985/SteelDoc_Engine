@@ -28,6 +28,9 @@ lTEMPS = []
 lTEMPP = []
 
 
+lActINF = []
+# lPlaINF = []
+
 vent1 = 1
 
 while (vent1 == 1):
@@ -54,19 +57,20 @@ while (vent1 == 1):
 
 
 Inf1 = Inferencia(lTEMPS, lTEMPP, Bh1)
-Inf1.modPon(lTEMPS, lTEMPP, 1)
+Inf1.modPon(lTEMPS, lTEMPP, 2)
 
 # auxS = input ("Homoclave de sintoma: ")
 
 
-db_Sin = sqlite3.connect("BC\Sint.db")
-db_Pla = sqlite3.connect("BC\Parts.db")
+# db_Pla = sqlite3.connect("BC\Parts.db")
+db_Sin = sqlite3.connect("BC\_Universal.db")
+# db_Pla = sqlite3.connect("BC\_Universal.db")
 
 l = 0
 
 lenSin=len(Inf1.Sbh.lSinCON)
 
-print("Sintomas ")
+print("\n\n\n\n--------------Sintomas--------------\n\n")
 
 while l < lenSin:
 
@@ -75,26 +79,43 @@ while l < lenSin:
     
     # print("*************{0} en {1}*******************".format(auxS, auxP))
     
-    cursorS = db_Sin.execute("select Clase, SubClase, Sintoma1, Sintoma2, Sintoma3 from Sintomas where Homoclave = ?",(auxS,))
-    cursorP = db_Pla.execute("select Clase, SubClase, Lugar1, Lugar2, Lugar3 from Lugar where Homoclave = ?",(auxP,))
+    cursorS = db_Sin.execute("select TRAD_Sin from Sintomas where Homoclave = ?",(auxS, ))
+    cursorP = db_Sin.execute("select TRAD_Pla from Lugar where Homoclave = ?",(auxP,))
     
-    
-    for row in cursorS:
-    
-        print(" {0}".format(row))
+    dCurS = cursorS.fetchall()
+    dCurP = cursorP.fetchall()
     
     
     
-    for row2 in cursorP:
+    print("Una posible causa raiz de estos problemas es {0} en {1}, ".format(dCurS[0][0],dCurP[0][0]))
+    
+    cursorS = db_Sin.execute("select IdCaso, HC_SOL from Rels where HC_Sin = :HC_Sin AND HC_Pla = :HC_Pla",{'HC_Sin':auxS, 'HC_Pla':auxP})
+    
+    dCurS = cursorS.fetchall()
+    
+    # print(dCurS)
+    
+    cursorP = db_Sin.execute("select TRAD_A, TRAD_Pla from VW_SolucionRelativa_TRAD where IdSOL = :IdSOL",{'IdSOL':dCurS[0][1]})
+    
+    dCurP = cursorP.fetchall()
+    
+    # lActINF[][]
+    
+    print(" coincide con el IdCaso {0}".format(dCurS[0][0]))
+    
+    print("*** la solucion relativa para este sintoma es: ***")
+    
+    i=0
+    for row in dCurP:
         
-        
-        print(" en {0},".format(row2))
-    
-    
+        print("{0} en {1}, ".format(dCurP[i][0],dCurP[i][1]))
+        i=i+1
     
     l=l+1
 
-print(" han sido devueltos como causa raiz")
+print("\n\n ***Buen Dia***")
+
+
 
 """
 for row in cursorS:
@@ -108,7 +129,7 @@ for row in cursorP:
 """
 
 db_Sin.close()
-db_Pla.close()
+# db_Pla.close()
 
 
 
