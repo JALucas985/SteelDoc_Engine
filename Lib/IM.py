@@ -97,7 +97,7 @@ class Inferencia:
             for i in lS:
             
                 MetaSintoma = VectorSintoma(lS[l],lP[l])
-                MetaSintoma.buscarSintomasRaiz()
+                MetaSintoma.buscarSintomasRaiz1()
                 self.Sbh.agregarSintomasINF(MetaSintoma.lRelSintRoot, MetaSintoma.lRelPlaceRoot)
                 l=l+1
                 self.Sbh.eliminarDuplicados(self.Sbh.lSinINF, self.Sbh.lPlaINF)
@@ -111,7 +111,7 @@ class Inferencia:
             
                 if l==0:
                     MetaSintoma = VectorSintoma(lS[l],lP[l])
-                    MetaSintoma.buscarSintomasRaiz()
+                    MetaSintoma.buscarSintomasRaiz1()
                     self.Sbh.agregarSintomasINF(MetaSintoma.lRelSintRoot, MetaSintoma.lRelPlaceRoot)
                     l=l+1
                     self.Sbh.eliminarDuplicados(self.Sbh.lSinINF, self.Sbh.lPlaINF)
@@ -119,7 +119,7 @@ class Inferencia:
                     
                 else:
                     MetaSintoma = VectorSintoma(lS[l],lP[l])
-                    MetaSintoma.buscarSintomasRaiz()
+                    MetaSintoma.buscarSintomasRaiz1()
                     self.Sbh.conjuncion(MetaSintoma.lRelSintRoot,MetaSintoma.lRelPlaceRoot)
                     self.Sbh.eliminarDuplicados(self.Sbh.lSinCON, self.Sbh.lPlaCON)
                     if self.Sbh.lSinCON == []:
@@ -134,6 +134,39 @@ class Inferencia:
                         self.lINF1P = self.lINF1P + self.Sbh.lPlaCON
                         
                     l=l+1
+                    
+
+        elif mode == 2 : #      Modo de compatibilidad con la base de datos
+
+            l=0
+            
+            for i in lS:
+                
+                # print (i)
+            
+                
+                MetaSintoma = VectorSintoma(lS[l],lP[l])
+                MetaSintoma.buscarSintomasRaiz1()
+                self.Sbh.agregarSintomasINF(MetaSintoma.lRelSintRoot, MetaSintoma.lRelPlaceRoot)
+                l=l+1
+                # self.Sbh.eliminarDuplicados(self.Sbh.lSinINF, self.Sbh.lPlaINF)
+                # print("Primera vez !!!! {0} en {1}".format(self.Sbh.lSinINF, self.Sbh.lPlaINF))
+
+            self.Sbh.actualizar_IdCaso()
+            self.Sbh.seleccion()    
+            
+            
+                    # self.Sbh.conjuncion(MetaSintoma.lRelSintRoot,MetaSintoma.lRelPlaceRoot)
+                    # self.Sbh.eliminarDuplicados(self.Sbh.lSinCON, self.Sbh.lPlaCON)
+           
+                        
+            print("Despues de la conjuncion: \nSintomas inferidos: {0} en {1}".format(self.Sbh.lSinCON,self.Sbh.lPlaCON))
+            self.lINF1S = self.lINF1S + self.Sbh.lSinCON
+            self.lINF1P = self.lINF1P + self.Sbh.lPlaCON
+                        
+            l=l+1                   
+                    
+        
     
 """
 
