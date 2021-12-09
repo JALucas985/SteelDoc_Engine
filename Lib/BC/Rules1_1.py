@@ -23,6 +23,10 @@ sintomatologias causantes o consecuentes
 
 """ Algunas reglas """
 
+
+import sqlite3
+
+
 inSint = ""  #'Sintoma entrante'
 inPlace = "" #'Lugar referente al sintoma entrante'
 
@@ -41,7 +45,9 @@ class VectorSintoma:
     lRelPlaceRoot = []
     
     lRelSolO = []
-    lRelPlaO = []     
+    lRelPlaO = []   
+    
+    lIdCaso = []    #   [ IdCaso ]
 
     outSol = ""
     auxSol = ""
@@ -65,6 +71,8 @@ class VectorSintoma:
         self.lRelSolO = []
         self.lRelPlaO = []     
 
+        self.lIdCaso = []
+        
         self.outSol = ""
         self.auxSol = ""
         
@@ -102,6 +110,66 @@ class VectorSintoma:
         # pass
     
     
+    def buscarSintomasRaiz1(self):
+        
+        lAuxS = []
+        lAuxP = []
+    
+        db_Uni = sqlite3.connect("BC\_Universal.db")
+        
+        cursorP = db_Uni.execute("select IdCaso, HC_SOL from Rels where HC_SIN = :HC_SIN and HC_PLA = :HC_PLA",{'HC_SIN':self.inS, 'HC_PLA':self.inP})
+        
+        CurP = cursorP.fetchall()   #       Obtenemos el IdCaso del sintoma original
+        
+        print(len(CurP))
+        print(CurP)
+        
+        if(len(CurP) == 0):
+            
+            print("Este sintoma no existe")
+            lAuxS = ["0.0.0.0.0"]
+            lAuxP = ["0.0.0.0.0"]
+        
+        else:
+        
+            cursorS = db_Uni.execute("select IdRoot from CausaRaiz where IdCaso = :IdCaso",{'IdCaso':CurP[0][0]})
+        
+            CurS = cursorS.fetchall()   #       Obtenemos el IdCaso de la raiz
+            
+            if(CurS[0][0] != 0):    #       Si el sintoma caso no es una causa raiz
+                
+            
+                i=0
+            
+                while(i<len(CurS)):
+            
+                    # print(len(CurS))
+                    print(i)
+                    print(CurS[i][0])
+                    self.lIdCaso = self.lIdCaso + [CurS[i][0]]
+                    cursorP = db_Uni.execute("select HC_SIN, HC_PLA from Rels where IdCaso = :IdCaso ",{'IdCaso':CurS[i][0]}) 
+                    CurP = cursorP.fetchall()   #       Obtenemos las variables del sintoma raiz
+                    print(CurP)
+                
+                    lAuxS = lAuxS + [CurP[0][0]]
+                    lAuxP = lAuxP + [CurP[0][1]]
+                    
+                
+                    i=i+1
+            else:
+                
+                lAuxS = ["0.0.0.0.0"]
+                lAuxP = ["0.0.0.0.0"]
+            
+                    
+        self.lRelSintRoot = self.lRelSintRoot + lAuxS
+        self.lRelPlaceRoot = self.lRelPlaceRoot + lAuxP
+                
+        print("Resultados: Sintoma {0} en {1} pueden ser causa raiz para {2} en {3}".format(self.lRelSintRoot, self.lRelPlaceRoot, self.inS, self.inP))    
+         
+        # pass        
+        
+        db_Uni.close()
     
     
     def buscarSintomasRaiz(self):
